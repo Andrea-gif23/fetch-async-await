@@ -82,7 +82,7 @@ function toggleFavorito(nombre) {
     const indice = favoritos.indexOf(nombre);
 
     if (indice > -1) {
-        favoritos.splice(indice, 1);
+        favoritos.splice(indice, 1); 
     } else {
         favoritos.push(nombre);
     }
