@@ -34,12 +34,16 @@ async function mostrarPokemones(pokemones) {
             const respuesta = await fetch(pokemon.url);
             const detalles = await respuesta.json();
 
-            
+            const favorito = esFavorito(detalles.name);
+
             const tarjetaPokemon = document.createElement("div");
             tarjetaPokemon.classList.add("tarjeta-pokemon");
             tarjetaPokemon.innerHTML = `
                 <img src="${detalles.sprites.front_default}" alt="${detalles.name}">
                 <p>${detalles.name}</p>
+                <button class="favorite-btn ${favorito ? 'favorito' : ''}" onclick="toggleFavorito('${detalles.name}')">
+                ${favorito ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
+                </button>
             `;
             appDiv.appendChild(tarjetaPokemon);
         } catch (error) {
@@ -56,15 +60,40 @@ async function buscarPokemon() {
         const respuesta = await fetch(`${urlApi}/${terminoBusqueda}`);
         const detalles = await respuesta.json();
 
+        const favorito = esFavorito(detalles.name);
+
         appDiv.innerHTML = `
             <div class="tarjeta-pokemon">
                 <img src="${detalles.sprites.front_default}" alt="${detalles.name}">
                 <p>${detalles.name}</p>
+                <button class="favorite-btn ${favorito ? 'favorito' : ''}" onclick="toggleFavorito('${detalles.name}')">
+                ${favorito ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
+                </button>
             </div>
         `;
     } catch (error) {
         appDiv.innerHTML = `<p>Pokémon no encontrado</p>`;
     }
+}
+
+//FUNCION PARA AGREGAR O QUITAR POKEMON DE LOS FAVORITOS
+function toggleFavorito(nombre) {
+    const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    const indice = favoritos.indexOf(nombre);
+
+    if (indice > -1) {
+        favoritos.splice(indice, 1);
+    } else {
+        favoritos.push(nombre);
+    }
+
+    localStorage.setItem('favoritos', JSON.stringify(favoritos));
+    obtenerPokemones(paginaActual);
+}
+
+function esFavorito(nombre) {
+    const favoritos = JSON.parse(localStorage.getItem('favoritos')) || [];
+    return favoritos.includes(nombre);
 }
 
 botonBuscar.addEventListener("click", buscarPokemon);
